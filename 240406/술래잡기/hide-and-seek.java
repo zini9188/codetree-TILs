@@ -2,283 +2,223 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
+
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static int n, m, h, k;
     static StringTokenizer st;
-    // 술래는 상 우 하 좌
+    // [5 ≤ n ≤ 99] [1 ≤ m, h ≤ n^2] [1 ≤ k ≤ 100] [1 ≤ x, y ≤ n]
+    // n: 맵의 크기     m: 도망자의 수   h: 나무의 수    k: 턴의 수
+    static int n, m, h, k;
     static int[] dx = {-1, 0, 1, 0}, dy = {0, 1, 0, -1};
-    static List<Integer>[][] map;
-    static int[][] tree;
-    static boolean flag = false;
-    static int score, t;
-    static boolean[] isGone;
+    static It it;
+    static Set<Integer>[][] map;
     static Runner[] runners;
-    static String[] ddd = new String[]{"상", "우", "하", "좌"};
+    static boolean[][] tree;
 
     public static void main(String[] args) throws IOException {
-        // 술래잡기 게임
-        // N*N 크기의 격자
-        // 술래는 정중앙에 서있음 ->
-        // m명의 도망자
-        // 종류
-        // 좌우로만 움직이는 유형 -> 항상 오른쪽 보고 시작
-        // 상하로만 움직이는 유형 -> 항상 아래쪽 보고 시작
+        init();
+        simulate();
+    }
 
-        // h개의 나무
-        // 초기에 겹쳐져서 주어지는 것 가능
-
-        // m명의 도망자가 먼저 동시에 움직임
-        // 술래 움직임
-        // k번 반복
-
-        // 술래와의 거리가 3이하인 도망자만 움직임
-        // 거리 측정 : | x1 - x2 | + | y1 - y2|
-
-        // 도망자는 1턴간 다음 규칙에 따라 움직임
-        // 바라보는 방향으로 1칸 움직일때 격자를 벗어나지 않는 경우
-        // 1. 술래가 있으면 움직이지 않음
-        // 2. 술래가 없으면 움직임, 나무 있어도 괜찮
-
-        // 격자 벗어나는 경우
-        // 먼저 방향을 반대로 틀음
-        // 바라보는 방향으로 한 칸 움직여서 술래가 없으면 이동
-
-        // -술래-
-        // 술래는 처음 위 방향으로 시작하여 달팽이 모양으로 이동
-        // 끝에 도달하면 다시 거꾸로 중심을 이동하고
-        // 중심에 오면 처음처럼 위 방향으로 시작하여 시계방향으로 도는것을
-        // K턴에 걸쳐 반복
-
-        // 1번의 턴동안 한 칸 해당하는 방향으로 이동
-        // 이동 후 만약 방향이 틀어지는 지점이면 바로 틀어줌
-        // 양끝에 해당하는 1,1 혹은 정중앙에 도달하면 역시 틀어야함
-        // 이동 직후 술래는 턴을 넘기기 전에 시야 내에 있는 도망자 잡음
-        // 시야는 바라보는 방향을 기준으로 현재 칸 포함하여 항상 3칸
-        // 하지만 나무가 있으면 해당 칸은 보이지 않음
-
-        // 잡힌 도망자는 사라짐. 술래는 현재 턴을 t번째 턴이라고 할 때
-        // t x 잡힌 도망자의 수 만큼의 점수를 얻음
-
+    private static void init() throws IOException {
         st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
         h = Integer.parseInt(st.nextToken());
         k = Integer.parseInt(st.nextToken());
-
-        map = new ArrayList[n + 1][n + 1];
-        tree = new int[n + 1][n + 1];
-        for (int i = 0; i <= n; i++) {
-            for (int j = 0; j <= n; j++) {
-                map[i][j] = new ArrayList<>();
+        map = new Set[n + 1][n + 1];
+        for (int i = 0; i < n + 1; i++) {
+            for (int j = 0; j < n + 1; j++) {
+                map[i][j] = new HashSet<>();
             }
         }
-        isGone = new boolean[m + 1];
-        runners = new Runner[m + 1];
 
+        // 술래
+        it = new It();
+
+        // 도망자
+        runners = new Runner[m + 1];
         for (int i = 1; i <= m; i++) {
             st = new StringTokenizer(br.readLine());
             int x = Integer.parseInt(st.nextToken());
             int y = Integer.parseInt(st.nextToken());
             int d = Integer.parseInt(st.nextToken());
-            map[x][y].add(i);
             runners[i] = new Runner(i, x, y, d);
+            map[x][y].add(i);
         }
+
+        // 나무
+        tree = new boolean[n + 1][n + 1];
         st = new StringTokenizer(br.readLine());
         int x = Integer.parseInt(st.nextToken());
         int y = Integer.parseInt(st.nextToken());
-        tree[x][y] = 1;
+        tree[x][y] = true;
+    }
 
-        Soolae soolae = new Soolae();
-
-        Deque<Point> dq = new ArrayDeque<>();
-        for (int i = 0; i < n * n; i++) {
-            dq.add(soolae.move());
-        }
-        dq.addFirst(new Point((n + 1) / 2, (n + 1) / 2, 0));
-
-        soolae = new Soolae();
+    private static void simulate() {
         for (int i = 1; i <= k; i++) {
             for (int j = 1; j <= m; j++) {
-                if (isGone[j]) {
+                Runner runner = runners[j];
+                if (runner.die) {
                     continue;
                 }
 
-                int dist = clac(runners[j], soolae);
-                if (dist <= 3) {
-                    runners[j].move(soolae);
-                }
+                runner.move();
             }
 
-            if (soolae.x == (n + 1) / 2 && soolae.y == (n + 1) / 2) {
-                flag = false;
-                dq.addLast(dq.pollFirst());
-            } else if (soolae.x == 1 && soolae.y == 1) {
-                flag = true;
-                dq.addFirst(dq.pollLast());
-            }
-
-            if (!flag) {
-                Point point = dq.pollFirst();
-                soolae.move2(point);
-                dq.addLast(point);
-            } else {
-                Point point = dq.pollLast();
-                soolae.move2(point);
-                dq.addFirst(point);
-            }
-            soolae.find(i);
+            it.move();
+            it.search(i);
         }
 
-        System.out.println(score);
+        System.out.println(it.score);
     }
 
-    private static int clac(Runner runner, Soolae soolae) {
-        return Math.abs(runner.x - soolae.x) + Math.abs(runner.y - soolae.y);
+    static int calcDistance(int x1, int y1, int x2, int y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    // 술래
-    static class Soolae {
-        // a = 회전해야하는 최대 횟수
-        // b = 해당 방향으로 간 횟수
-        // c = 회전 횟수
-        int x, y, dir, a, b, c;
-
-        public Soolae() {
-            x = (n + 1) / 2;
-            y = (n + 1) / 2;
-            dir = 0;
-            a = 1;
-            b = 0;
-            c = 0;
-        }
-
-        // 술래는 1,1,2,2,3,3,4,4,5,5의 형태로 증가함
-        public Point move() {
-            // 앞으로 감
-            x += dx[dir];
-            y += dy[dir];
-            b++;
-            // 옆에 봄
-            if (b == a) {
-                dir = (dir + 1) % 4;
-                b = 0;
-                c++;
-            }
-
-            // 두번 회전하면 a값 증가
-            if (c == 2) {
-                c = 0;
-                a++;
-            }
-
-            return new Point(x, y, dir);
-        }
-
-        public void move2(Point point) {
-            this.x = point.x;
-            this.y = point.y;
-            this.dir = flag ? (point.d + 2) % 4 : point.d;
-        }
-
-        public void find(int t) {
-            int cnt = 0;
-            for (int i = 0; i < 3; i++) {
-                int nx = x + dx[dir] * i;
-                int ny = y + dy[dir] * i;
-                if (outRange(nx, ny)) {
-                    continue;
-                }
-
-                for (int j = map[nx][ny].size() - 1; j >= 0; j--) {
-                    if (tree[nx][ny] == 0) {
-                        Integer next = map[nx][ny].get(j);
-                        isGone[next] = true;
-                        cnt++;
-                        map[nx][ny].remove(next);
-                    }
-                }
-            }
-            score += t * cnt;
-        }
-
-        @Override
-        public String toString() {
-            return "Soolae{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    ", dir=" + ddd[dir] +
-                    ", a=" + a +
-                    ", b=" + b +
-                    ", c=" + c +
-                    ", flag=" + flag +
-                    '}';
-        }
+    static boolean outRange(int x, int y) {
+        return x < 1 || y < 1 || x > n || y > n;
     }
 
     static class Runner {
-        int idx, x, y, d, type;
 
-        public Runner(int idx, int x, int y, int type) {
+        int idx, x, y, direction, d;
+        boolean die;
+
+        //d가 1인 경우 좌우로 움직임을
+        //2인 경우 상하로만 움직임을
+        //좌우로 움직이는 사람은 항상 오른쪽 1
+        //상하로 움직이는 사람은 항상 아래쪽 2
+        public Runner(int idx, int x, int y, int d) {
             this.idx = idx;
             this.x = x;
             this.y = y;
-            this.d = type == 1 ? 1 : 2;
-            this.type = type;
+            this.direction = d == 1 ? 1 : 2;
+            this.d = d;
+            die = false;
         }
 
+        // 술래와의 거리가 3 이하인 도망자만
+        // 두 사람간의 거리는 |x1 - x2| + |y1 - y2|
+        public boolean isNearByIt() {
+            int distance = calcDistance(x, y, it.x, it.y);
+            return distance <= 3;
+        }
 
-        public void move(Soolae soolae) {
-            int nx = x + dx[d];
-            int ny = y + dy[d];
-
-            // 격자 벗어나는 경우
-            if (outRange(nx, ny)) {
-                d = (d + 2) % 4;
-                nx = x + dx[d];
-                ny = y + dy[d];
-
+        //술래와의 거리가 3 이하인 도망자들은 1턴 동안 다음 규칙에 따라 움직이게 됩니다.
+        public void move() {
+            if (!isNearByIt()) {
+                return;
             }
 
-            if (!(soolae.x == nx && soolae.y == ny)) {
-                map[x][y].remove((Integer) idx);
+            //현재 바라보고 있는 방향으로 1칸 움직인다 했을 때 격자를 벗어나지 않는 경우
+            //움직이려는 칸에 술래가 있는 경우라면 움직이지 않습니다.
+            int nx = x + dx[direction];
+            int ny = y + dy[direction];
+
+            //현재 바라보고 있는 방향으로 1칸 움직인다 했을 때 격자를 벗어나는 경우 방향을 반대로 틀어줍니다
+            if (outRange(nx, ny)) {
+                direction = (direction + 2) % 4;
+                nx = x + dx[direction];
+                ny = y + dy[direction];
+            }
+
+            //움직이려는 칸에 술래가 있지 않다면 해당 칸으로 이동합니다. 해당 칸에 나무가 있어도 괜찮습니다.
+            if (!(nx == it.x && ny == it.y)) {
+                map[x][y].remove(idx);
                 x = nx;
                 y = ny;
                 map[x][y].add(idx);
             }
         }
-
-        @Override
-        public String toString() {
-            return "Domangja{" +
-                    "idx=" + idx +
-                    ", x=" + x +
-                    ", y=" + y +
-                    ", d=" + ddd[d] +
-                    ", type=" + type +
-                    '}';
-        }
     }
 
-    static class Point {
-        int x, y, d;
+    static class It {
 
-        public Point(int x, int y, int d) {
-            this.x = x;
-            this.y = y;
-            this.d = d;
+        int x, y, look, cnt, moveIndex, score;
+        int[] move;
+        boolean flag;
+
+        public It() {
+            x = (n + 1) / 2;
+            y = (n + 1) / 2;
+            look = 0;
+            cnt = 0;
+            moveIndex = 0;
+            move = new int[n * 2 - 1];
+            flag = false;
+            score = 0;
+
+            int dist = 1;
+            for (int i = 0; i < n * 2 - 2; i += 2) {
+                move[i] = move[i + 1] = dist++;
+            }
+            move[n * 2 - 2] = dist - 1;
         }
 
         @Override
         public String toString() {
-            return "Point{" +
+            return "It{" +
                     "x=" + x +
                     ", y=" + y +
-                    ", d=" + ddd[d] +
+                    ", look=" + (look == 0 ? "상" : look == 1 ? "우" : look == 2 ? "하" : "좌") +
+                    ", cnt=" + cnt +
+                    ", moveIndex=" + moveIndex +
+                    ", move=" + Arrays.toString(move) +
                     '}';
         }
-    }
 
-    private static boolean outRange(int x, int y) {
-        return x < 1 || y < 1 || x > n || y > n;
+        public void move() {
+            x = x + dx[look];
+            y = y + dy[look];
+            cnt++;
+
+            // 움직이는 방향으로 개수 다 채우면
+            if (cnt == move[moveIndex]) {
+                if (flag) {
+                    moveIndex--;
+                    look = (look + 4 - 1) % 4;
+                } else {
+                    moveIndex++;
+                    look = (look + 1) % 4;
+                }
+                cnt = 0;
+            }
+
+            // 중앙에선 위를
+            if (x == (n + 1) / 2 && y == (n + 1) / 2) {
+                look = 0;
+                moveIndex = 0;
+                flag = false;
+            }
+            // 1,1에선 아래를 봐야함
+            else if (x == 1 && y == 1) {
+                look = 2;
+                moveIndex = n * 2 - 2;
+                flag = true;
+            }
+        }
+
+        public void search(int turn) {
+            for (int i = 0; i < 3; i++) {
+                int nx = x + dx[look] * i;
+                int ny = y + dy[look] * i;
+
+                // 밖이거나 나무 있으면 안봄
+                if (outRange(nx, ny) || tree[nx][ny]) {
+                    continue;
+                }
+
+                // 도망자 있으면 점수 더함
+                if (!map[nx][ny].isEmpty()) {
+                    score += turn * map[nx][ny].size();
+                    for (Integer index : map[nx][ny]) {
+                        runners[index].die = true;
+                    }
+                    map[nx][ny] = new HashSet<>();
+                }
+            }
+
+        }
     }
 }
