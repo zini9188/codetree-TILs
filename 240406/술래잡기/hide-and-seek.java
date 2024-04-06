@@ -5,6 +5,7 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
+
     // [5 ≤ n ≤ 99] [1 ≤ m, h ≤ n^2] [1 ≤ k ≤ 100] [1 ≤ x, y ≤ n]
     // n: 맵의 크기     m: 도망자의 수   h: 나무의 수    k: 턴의 수
     static int n, m, h, k;
@@ -48,10 +49,12 @@ public class Main {
 
         // 나무
         tree = new boolean[n + 1][n + 1];
-        st = new StringTokenizer(br.readLine());
-        int x = Integer.parseInt(st.nextToken());
-        int y = Integer.parseInt(st.nextToken());
-        tree[x][y] = true;
+        for (int i = 0; i < h; i++) {
+            st = new StringTokenizer(br.readLine());
+            int x = Integer.parseInt(st.nextToken());
+            int y = Integer.parseInt(st.nextToken());
+            tree[x][y] = true;
+        }
     }
 
     private static void simulate() {
@@ -61,7 +64,6 @@ public class Main {
                 if (runner.die) {
                     continue;
                 }
-
                 runner.move();
             }
 
@@ -156,18 +158,6 @@ public class Main {
             move[n * 2 - 2] = dist - 1;
         }
 
-        @Override
-        public String toString() {
-            return "It{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    ", look=" + (look == 0 ? "상" : look == 1 ? "우" : look == 2 ? "하" : "좌") +
-                    ", cnt=" + cnt +
-                    ", moveIndex=" + moveIndex +
-                    ", move=" + Arrays.toString(move) +
-                    '}';
-        }
-
         public void move() {
             x = x + dx[look];
             y = y + dy[look];
@@ -184,6 +174,8 @@ public class Main {
                 }
                 cnt = 0;
             }
+            // 상 우 하 좌
+            // 하 우 상 좌
 
             // 중앙에선 위를
             if (x == (n + 1) / 2 && y == (n + 1) / 2) {
@@ -218,7 +210,6 @@ public class Main {
                     map[nx][ny] = new HashSet<>();
                 }
             }
-
         }
     }
 }
