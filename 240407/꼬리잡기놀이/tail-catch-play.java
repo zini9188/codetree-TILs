@@ -284,6 +284,76 @@ public class Main {
                         }
                     }
                 }
+            } else if (dir == 1) {
+                for (int i = n - 1; i >= 0; i--) {
+                    // 사람이 있는 경우
+                    int value = map[i][round - 1];
+                    if (value > 0) {
+                        // 해당 사람의 팀
+                        int teamIndex = personTeam[value];
+                        for (Person person : teams[teamIndex].people) {
+                            // 해당 사람의 팀에서 값 찾음
+                            if (person.idx == value) {
+                                // 역방향인 경우
+                                Team team = teams[teamIndex];
+                                if (team.flag) {
+                                    team.flag = false;
+                                    return team.people.get(team.people.size() - 1).idx
+                                            - person.idx + 1;
+                                } else {
+                                    team.flag = true;
+                                    return person.idx - team.people.get(0).idx + 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (dir == 2) {
+                for (int i = n - 1; i > 0; i--) {
+                    int value = map[round - 1][i];
+                    if (value > 0) {
+                        // 해당 사람의 팀
+                        int teamIndex = personTeam[value];
+                        for (Person person : teams[teamIndex].people) {
+                            // 해당 사람의 팀에서 값 찾음
+                            if (person.idx == value) {
+                                // 역방향인 경우
+                                Team team = teams[teamIndex];
+                                if (team.flag) {
+                                    team.flag = false;
+                                    return team.people.get(team.people.size() - 1).idx
+                                            - person.idx + 1;
+                                } else {
+                                    team.flag = true;
+                                    return person.idx - team.people.get(0).idx + 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                for (int i = 0; i < n; i++) {
+                    int value = map[round - 1][i];
+                    if (value > 0) {
+                        // 해당 사람의 팀
+                        int teamIndex = personTeam[value];
+                        for (Person person : teams[teamIndex].people) {
+                            // 해당 사람의 팀에서 값 찾음
+                            if (person.idx == value) {
+                                // 역방향인 경우
+                                Team team = teams[teamIndex];
+                                if (team.flag) {
+                                    team.flag = false;
+                                    return team.people.get(team.people.size() - 1).idx
+                                            - person.idx + 1;
+                                } else {
+                                    team.flag = true;
+                                    return person.idx - team.people.get(0).idx + 1;
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             return -1;
