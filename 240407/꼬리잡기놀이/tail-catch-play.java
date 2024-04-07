@@ -23,15 +23,17 @@ public class Main {
     private static void simulate() {
         for (int i = 1; i <= k; i++) {
             moveTeams();
-            int score = ball.move((i - 1) % 4);
+            int score = ball.move((i - 1) % n);
 
-            if (score > 1) {
-                ans += Math.pow(score, 2);
+            if (score >= 1) {
+                double pow = Math.pow(score, 2);
+                ans += pow;
             }
 
-            if (i % 4 == 0) {
+            if (i % n == 0) {
                 ball.rotate();
             }
+            print();
         }
     }
 
@@ -39,8 +41,6 @@ public class Main {
         for (int i = 1; i <= m; i++) {
             teams[i].move();
         }
-
-        print();
     }
 
     private static void init() throws IOException {
@@ -115,6 +115,7 @@ public class Main {
 //            System.out.println(team);
 //        }
 //        System.out.println(Arrays.deepToString(map).replaceAll("],", "\n").replaceAll("-1", "-"));
+//        System.out.println(ball);
     }
 
     private static boolean outRange(int x, int y) {
@@ -131,8 +132,8 @@ public class Main {
             this.y = y;
         }
 
-        public Person(Person front) {
-            this.idx = front.idx + 1;
+        public Person(Person front, int idx) {
+            this.idx = front.idx + idx;
             this.x = front.x;
             this.y = front.y;
         }
@@ -169,7 +170,7 @@ public class Main {
             if (flag) {
                 // 머리 사람 움직임
                 Person front = people.get(people.size() - 1);
-                Person temp = new Person(front);
+                Person temp = new Person(front, -1);
                 for (int i = 0; i < 4; i++) {
                     int nx = front.x + dx[i];
                     int ny = front.y + dy[i];
@@ -186,7 +187,7 @@ public class Main {
 
                 for (int i = people.size() - 2; i > 0; i--) {
                     // 현재 사람 복사
-                    Person t = new Person(people.get(i));
+                    Person t = new Person(people.get(i), -1);
                     // 다음 좌표로 현재 사람 인덱스 복사
                     map[temp.x][temp.y] = temp.idx;
                     // 현재 사람 바꾸기
@@ -194,7 +195,7 @@ public class Main {
                     temp = t;
                 }
 
-                Person tail = new Person(people.get(0));
+                Person tail = new Person(people.get(0), -1);
                 map[temp.x][temp.y] = temp.idx;
                 people.set(0, temp);
                 map[tail.x][tail.y] = -1;
@@ -203,7 +204,7 @@ public class Main {
             else {
                 // 머리 사람 움직임
                 Person front = people.get(0);
-                Person temp = new Person(front);
+                Person temp = new Person(front, 1);
                 for (int i = 0; i < 4; i++) {
                     int nx = front.x + dx[i];
                     int ny = front.y + dy[i];
@@ -220,7 +221,7 @@ public class Main {
 
                 for (int i = 1; i < people.size() - 1; i++) {
                     // 현재 사람 복사
-                    Person t = new Person(people.get(i));
+                    Person t = new Person(people.get(i), 1);
                     // 다음 좌표로 현재 사람 인덱스 복사
                     map[temp.x][temp.y] = temp.idx;
                     // 현재 사람 바꾸기
@@ -228,7 +229,7 @@ public class Main {
                     temp = t;
                 }
 
-                Person tail = new Person(people.get(people.size() - 1));
+                Person tail = new Person(people.get(people.size() - 1), 1);
                 people.set(people.size() - 1, temp);
                 map[temp.x][temp.y] = temp.idx;
                 map[tail.x][tail.y] = -1;
@@ -256,6 +257,13 @@ public class Main {
 
         public Ball() {
             dir = 0;
+        }
+
+        @Override
+        public String toString() {
+            return "Ball{" +
+                    "dir=" + dir +
+                    '}';
         }
 
         // 우 상 좌 하
@@ -356,6 +364,7 @@ public class Main {
                 }
             }
 
+            System.out.println("못찾음 ..");
             return -1;
         }
 
