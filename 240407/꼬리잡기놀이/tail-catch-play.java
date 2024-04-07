@@ -363,8 +363,6 @@ public class Main {
                     }
                 }
             }
-
-            System.out.println("못찾음 ..");
             return -1;
         }
 
