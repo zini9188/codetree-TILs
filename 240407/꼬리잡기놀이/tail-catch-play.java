@@ -23,7 +23,7 @@ public class Main {
     private static void simulate() {
         for (int i = 1; i <= k; i++) {
             moveTeams();
-            int score = ball.move(i);
+            int score = ball.move((i - 1) % 4);
 
             if (score > 1) {
                 ans += Math.pow(score, 2);
@@ -263,7 +263,7 @@ public class Main {
             if (dir == 0) {
                 for (int i = 0; i < n; i++) {
                     // 사람이 있는 경우
-                    int value = map[round - 1][i];
+                    int value = map[round][i];
                     if (value > 0) {
                         // 해당 사람의 팀
                         int teamIndex = personTeam[value];
@@ -287,7 +287,7 @@ public class Main {
             } else if (dir == 1) {
                 for (int i = n - 1; i >= 0; i--) {
                     // 사람이 있는 경우
-                    int value = map[i][round - 1];
+                    int value = map[i][round];
                     if (value > 0) {
                         // 해당 사람의 팀
                         int teamIndex = personTeam[value];
@@ -310,7 +310,7 @@ public class Main {
                 }
             } else if (dir == 2) {
                 for (int i = n - 1; i > 0; i--) {
-                    int value = map[round - 1][i];
+                    int value = map[round][i];
                     if (value > 0) {
                         // 해당 사람의 팀
                         int teamIndex = personTeam[value];
@@ -333,7 +333,7 @@ public class Main {
                 }
             } else {
                 for (int i = 0; i < n; i++) {
-                    int value = map[round - 1][i];
+                    int value = map[round][i];
                     if (value > 0) {
                         // 해당 사람의 팀
                         int teamIndex = personTeam[value];
