@@ -81,8 +81,7 @@ public class Main {
             q.add(person);
             visited[person.x][person.y] = true;
             teams[teamIndex].people.add(person);
-            personTeam[personIndex] = teamIndex;
-            map[person.x][person.y] = personIndex++;
+            personTeam[personIndex++] = teamIndex;
             while (!q.isEmpty()) {
                 Person cur = q.poll();
 
@@ -95,6 +94,10 @@ public class Main {
                         continue;
                     }
 
+                    if (map[cur.x][cur.y] == 1 && map[nx][ny] == 3) {
+                        continue;
+                    }
+
                     visited[nx][ny] = true;
                     map[nx][ny] = personIndex;
                     personTeam[personIndex] = teamIndex;
@@ -103,6 +106,8 @@ public class Main {
                     q.add(np);
                 }
             }
+            map[person.x][person.y] = person.idx;
+
             teamIndex++;
         }
 
@@ -171,19 +176,24 @@ public class Main {
                 // 머리 사람 움직임
                 Person front = people.get(people.size() - 1);
                 Person temp = new Person(front, -1);
+                int x = 0;
+                int y = 0;
+                int v = Integer.MAX_VALUE;
                 for (int i = 0; i < 4; i++) {
                     int nx = front.x + dx[i];
                     int ny = front.y + dy[i];
 
-                    if (outRange(nx, ny)) {
+                    if (outRange(nx, ny) || map[nx][ny] == 0) {
                         continue;
                     }
 
-                    if (map[nx][ny] == -1) {
-                        front.move(nx, ny);
-                        break;
+                    if (map[nx][ny] < v) {
+                        v = map[nx][ny];
+                        x = nx;
+                        y = ny;
                     }
                 }
+                front.move(x, y);
 
                 for (int i = people.size() - 2; i > 0; i--) {
                     // 현재 사람 복사
@@ -198,26 +208,33 @@ public class Main {
                 Person tail = new Person(people.get(0), -1);
                 map[temp.x][temp.y] = temp.idx;
                 people.set(0, temp);
-                map[tail.x][tail.y] = -1;
+                if (map[tail.x][tail.y] == temp.idx) {
+                    map[tail.x][tail.y] = -1;
+                }
             }
             // 정방향
             else {
                 // 머리 사람 움직임
                 Person front = people.get(0);
                 Person temp = new Person(front, 1);
+                int x = 0;
+                int y = 0;
+                int v = Integer.MAX_VALUE;
                 for (int i = 0; i < 4; i++) {
                     int nx = front.x + dx[i];
                     int ny = front.y + dy[i];
 
-                    if (outRange(nx, ny)) {
+                    if (outRange(nx, ny) || map[nx][ny] == 0) {
                         continue;
                     }
 
-                    if (map[nx][ny] == -1) {
-                        front.move(nx, ny);
-                        break;
+                    if (map[nx][ny] < v) {
+                        v = map[nx][ny];
+                        x = nx;
+                        y = ny;
                     }
                 }
+                front.move(x, y);
 
                 for (int i = 1; i < people.size() - 1; i++) {
                     // 현재 사람 복사
@@ -232,7 +249,9 @@ public class Main {
                 Person tail = new Person(people.get(people.size() - 1), 1);
                 people.set(people.size() - 1, temp);
                 map[temp.x][temp.y] = temp.idx;
-                map[tail.x][tail.y] = -1;
+                if (map[tail.x][tail.y] == temp.idx) {
+                    map[tail.x][tail.y] = -1;
+                }
             }
         }
 
