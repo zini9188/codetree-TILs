@@ -23,20 +23,20 @@ public class Main {
 
         long e = 0;
         for (long store : stores) {
+            if (store - a == 0) {
+                e++;
+                continue;
+            }
+
             double c = (double) (store - a) / b;
             long d = (long) c;
 
-            if(c - d > 0){
+            if (c - d > 0) {
                 d++;
             }
-
-            if(d > e){
-                e = d;
-            }
+            e += d + 1;
         }
-
-        e++;
-        sb.append(e * stores.size());
+        sb.append(e);
         bw.write(sb.toString());
         bw.close();
         br.close();
