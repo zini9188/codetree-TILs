@@ -23,7 +23,7 @@ public class Main {
 
         long e = 0;
         for (long store : stores) {
-            if (store - a == 0) {
+            if (store - a <= 0) {
                 e++;
                 continue;
             }
