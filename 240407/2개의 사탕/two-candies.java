@@ -8,8 +8,8 @@ public class Main {
     static int N, M;
     static char[][] box;
     static Queue<Pair> q;
-    static Pair pair;
     static int[] dx = {1, -1, 0, 0}, dy = {0, 0, 1, -1};
+    static boolean[][][][] visited;
 
 
     public static void main(String[] args) throws IOException {
@@ -71,8 +71,11 @@ public class Main {
                             }
                         }
 
-                        q.add(new Pair(new Candy(blueInfo.x, blueInfo.y),
-                                new Candy(redInfo.x, redInfo.y)));
+                        if (!visited[blueInfo.x][blueInfo.y][redInfo.x][redInfo.y]) {
+                            q.add(new Pair(new Candy(blueInfo.x, blueInfo.y),
+                                    new Candy(redInfo.x, redInfo.y)));
+                            visited[blueInfo.x][blueInfo.y][redInfo.x][redInfo.y] = true;
+                        }
                     }
                 }
             }
@@ -119,7 +122,7 @@ public class Main {
                 }
             }
         }
-
+        visited = new boolean[N][M][N][M];
         q = new ArrayDeque<>();
         q.add(new Pair(blue, red));
     }
@@ -138,15 +141,6 @@ public class Main {
             this.x = x;
             this.y = y;
             this.m = m;
-        }
-
-        @Override
-        public String toString() {
-            return "Candy{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    ", m=" + m +
-                    '}';
         }
     }
 
