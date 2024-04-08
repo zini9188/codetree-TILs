@@ -45,9 +45,9 @@ public class Main {
             } else if (ball.dir == NORTH) {
                 move = ball.move(n - i - 1, round);
             } else if (ball.dir == WEST) {
-                move = ball.move(round, n - i - 1);
+                move = ball.move(n - round - 1, n - i - 1);
             } else {
-                move = ball.move(i, round);
+                move = ball.move(i, n - round - 1);
             }
 
             if (move > 0) {
@@ -211,7 +211,7 @@ public class Main {
         }
 
         public int score(int n) {
-            return Math.abs(n - (head.idx % 1000) + 1);
+            return Math.abs(n - head.idx % 1000) + 1;
         }
 
         public void reverse() {
@@ -253,6 +253,14 @@ public class Main {
 
         public void rotate() {
             dir = (dir + 1) % 4;
+        }
+
+        @Override
+        public String toString() {
+            return "Ball{" +
+                    "round=" + round +
+                    ", dir=" + dir +
+                    '}';
         }
     }
 }
