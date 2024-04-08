@@ -43,9 +43,9 @@ public class Main {
             if (ball.dir == EAST) {
                 move = ball.move(round, i);
             } else if (ball.dir == NORTH) {
-                move = ball.move(n - i + 1, round);
-            } else if (ball.dir == WEST) {
                 move = ball.move(n - i - 1, round);
+            } else if (ball.dir == WEST) {
+                move = ball.move(round, n - i - 1);
             } else {
                 move = ball.move(i, round);
             }
