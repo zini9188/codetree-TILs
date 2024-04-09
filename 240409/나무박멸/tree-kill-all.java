@@ -25,6 +25,7 @@ public class Main {
             growTrees();
             spreadTrees(year);
             destroy(year);
+//            print();
         }
         System.out.println(ans);
     }
@@ -172,8 +173,11 @@ public class Main {
             }
         }
 
-        // 해당 나무 없앰
+        if (info[0] == -1 || info[1] == -1 || info[2] == -1) {
+            return;
+        }
 
+        // 해당 나무 없앰
         ans += treeMap[info[1]][info[2]];
         trees.remove(new Tree(info[1], info[2]));
         treeMap[info[1]][info[2]] = 0;
