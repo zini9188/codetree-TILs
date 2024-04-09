@@ -5,7 +5,7 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
-    // 격자 크기 n, 박멸년수, 제초제 퍼지는 범위 k, 제초제 남는 수 c
+    // 격자 크기 n, 박멸년수 m, 제초제 퍼지는 범위 k, 제초제 남는 수 c
     static int N, M, K, C;
     static int[][] map;
     static int[][] treeMap;
@@ -23,8 +23,13 @@ public class Main {
     private static void simulate() {
         for (int year = 1; year <= M; year++) {
             growTrees();
+//            System.out.println("grow");
+//            print();
             spreadTrees(year);
+//            System.out.println("spread");
+//            print();
             destroy(year);
+//            System.out.println("destroy");
 //            print();
         }
         System.out.println(ans);
@@ -32,7 +37,8 @@ public class Main {
 
     static void print() {
         System.out.println(Arrays.deepToString(map).replaceAll("],", "\n").replaceAll("-1", "ㅁ"));
-        System.out.println(Arrays.deepToString(treeMap).replaceAll("],", "\n"));
+        System.out.println(
+                Arrays.deepToString(treeMap).replaceAll("],", "\n").replaceAll("-1", "ㅁ"));
         System.out.println(trees);
     }
 
@@ -74,7 +80,9 @@ public class Main {
                 }
                 count++;
             }
-            queue.add(new Tree(tree.x, tree.y, count));
+            if (count >= 1) {
+                queue.add(new Tree(tree.x, tree.y, count));
+            }
         }
 
         while (!queue.isEmpty()) {
@@ -156,7 +164,11 @@ public class Main {
                             int ny = y + dy[k] * l;
 
                             // 범위 밖, 벽이거나 나무가 없으면 넘어감
-                            if (outRange(nx, ny) || treeMap[nx][ny] <= 0) {
+                            if (outRange(nx, ny)) {
+                                break;
+                            }
+
+                            if (treeMap[nx][ny] <= 0) {
                                 break;
                             }
 
@@ -191,7 +203,12 @@ public class Main {
                 int ny = info[2] + dy[k] * l;
 
                 // 범위 밖, 벽이거나 나무가 없으면 넘어감
-                if (outRange(nx, ny) || treeMap[nx][ny] <= 0) {
+                if (outRange(nx, ny)) {
+                    break;
+                }
+
+                if (treeMap[nx][ny] <= 0) {
+                    map[nx][ny] = year + C;
                     break;
                 }
 
