@@ -29,8 +29,8 @@ public class Main {
     }
 
     private static void print() {
-        System.out.println(Arrays.deepToString(obstacles).replaceAll("],","\n"));
-        System.out.println(Arrays.deepToString(treeMap).replaceAll("],","\n"));
+        System.out.println(Arrays.deepToString(obstacles).replaceAll("],", "\n"));
+        System.out.println(Arrays.deepToString(treeMap).replaceAll("],", "\n"));
     }
 
     private static void putObstacle(int year) {
@@ -126,16 +126,8 @@ public class Main {
     }
 
     private static void growTrees() {
-        List<Tree> growingTrees = new ArrayList<>();
         for (Tree tree : trees) {
-            int grow = tree.grow();
-            if (grow > 0) {
-                growingTrees.add(new Tree(tree.x, tree.y, grow));
-            }
-        }
-
-        for (Tree growingTree : growingTrees) {
-            treeMap[growingTree.x][growingTree.y] += growingTree.c;
+            tree.grow();
         }
     }
 
@@ -179,8 +171,7 @@ public class Main {
             this.c = c;
         }
 
-        public int grow() {
-            int count = 0;
+        public void grow() {
             for (int i = 0; i < 4; i++) {
                 int nx = x + dx[i];
                 int ny = y + dy[i];
@@ -189,11 +180,9 @@ public class Main {
                 }
 
                 if (treeMap[nx][ny] > 0) {
-                    count++;
+                    treeMap[x][y]++;
                 }
             }
-
-            return count;
         }
 
         public int spreadCount(int year) {
