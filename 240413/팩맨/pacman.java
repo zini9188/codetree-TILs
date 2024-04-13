@@ -215,7 +215,7 @@ public class Main {
                 int nx = x + ddx[(d + i) % 8];
                 int ny = y + ddy[(d + i) % 8];
                 // 격자밖, 시체있음, 팩맨있음 넘어감
-                if (outRange(nx, ny) || deadMonsters[nx][ny] >= turn || (nx == pacman.x
+                if (outRange(nx, ny) || deadMonsters[nx][ny] > turn || (nx == pacman.x
                         && ny == pacman.y)) {
                     continue;
                 }     // 갈 수 있는 경우
