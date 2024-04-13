@@ -159,11 +159,9 @@ public class Main {
                             continue;
                         }
 
-                        int count = 0;
-                        if (nx1 == nx3 && ny1 == ny3) {
-                            count = aliveMonsters[nx1][ny1].size() + aliveMonsters[nx2][ny2].size();
-                        } else {
-                            count = aliveMonsters[nx1][ny1].size() + aliveMonsters[nx2][ny2].size() + aliveMonsters[nx3][ny3].size();
+                        int count = aliveMonsters[nx1][ny1].size() + aliveMonsters[nx2][ny2].size();
+                        if (nx1 != nx3 || ny1 != ny3) {
+                            count += aliveMonsters[nx3][ny3].size();
                         }
 
                         // 갱신 가능하면 갱신
@@ -183,8 +181,10 @@ public class Main {
             while (key > 0) {
                 int dir = key % 10 - 1;
                 pacman.moveDir(dir);
+                if(!aliveMonsters[pacman.x][pacman.y].isEmpty()){
+                    deadMonsters[pacman.x][pacman.y] = turn + 2;
+                }
                 aliveMonsters[pacman.x][pacman.y].clear();
-                deadMonsters[pacman.x][pacman.y] = turn + 2;
                 key /= 10;
             }
         }
@@ -215,8 +215,8 @@ public class Main {
                 int nx = x + ddx[(d + i) % 8];
                 int ny = y + ddy[(d + i) % 8];
                 // 격자밖, 시체있음, 팩맨있음 넘어감
-                if (outRange(nx, ny) || deadMonsters[nx][ny] > turn || (nx == pacman.x
-                        && ny == pacman.y)) {
+                if (outRange(nx, ny) || deadMonsters[nx][ny] >= turn ||
+                        (nx == pacman.x && ny == pacman.y)) {
                     continue;
                 }     // 갈 수 있는 경우
                 // 해당 객체 지우고
