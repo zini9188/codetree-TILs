@@ -226,6 +226,7 @@ public class Main {
                 d = (d + i) % 8;
                 return this;
             }
+            aliveMonsters[x][y].remove(this);
             return this;
         }
     }
