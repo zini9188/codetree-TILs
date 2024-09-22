@@ -27,7 +27,7 @@ public class Main {
 
             golems[i] = new Golem(i, d, new Point(1, c));
             move(golems[i]);
-            if (golems[i].c.x <= 1) {
+            if (golems[i].c.x <= 2) {
                 board = new int[R + 2][C];
                 continue;
             }
@@ -78,7 +78,7 @@ public class Main {
             } else if (step == 2) {
                 c = c.next(LEFT);
                 c = c.next(DOWN);
-                d = (4 + d - 1) % 4;
+                d = (3 + d) % 4;
             } else if (step == 3) {
                 c = c.next(RIGHT);
                 c = c.next(DOWN);
@@ -88,98 +88,41 @@ public class Main {
 
         public boolean canMove(int step) {
             Point n;
+
             if (step == 1) {
                 n = c.next(DOWN);
-
-                for (int i = 0; i < 4; i++) {
-                    int nx = n.x + dx[i];
-                    int ny = n.y + dy[i];
-
-                    if (inRange(nx, ny)) {
-                        if (board[nx][ny] != 0) {
-                            if (board[nx][ny] == idx) {
-                                continue;
-                            }
-                            return false;
-                        }
-                    } else {
-                        return false;
-                    }
-                }
             } else if (step == 2) {
                 n = c.next(LEFT);
-
-                for (int i = 0; i < 4; i++) {
-                    int nx = n.x + dx[i];
-                    int ny = n.y + dy[i];
-
-                    if (inRange(nx, ny)) {
-                        if (board[nx][ny] != 0) {
-                            if (board[nx][ny] == idx) {
-                                continue;
-                            }
-                            return false;
-                        }
-                    } else {
-                        return false;
-                    }
+                if (!check(n)) {
+                    return false;
                 }
-
                 n = n.next(DOWN);
-
-                for (int i = 0; i < 4; i++) {
-                    int nx = n.x + dx[i];
-                    int ny = n.y + dy[i];
-
-                    if (inRange(nx, ny)) {
-                        if (board[nx][ny] != 0) {
-                            if (board[nx][ny] == idx) {
-                                continue;
-                            }
-                            return false;
-                        }
-                    } else {
-                        return false;
-                    }
-                }
             } else {
                 n = c.next(RIGHT);
-
-                for (int i = 0; i < 4; i++) {
-                    int nx = n.x + dx[i];
-                    int ny = n.y + dy[i];
-
-                    if (inRange(nx, ny)) {
-                        if (board[nx][ny] != 0) {
-                            if (board[nx][ny] == idx) {
-                                continue;
-                            }
-                            return false;
-                        }
-                    } else {
-                        return false;
-                    }
+                if (!check(n)) {
+                    return false;
                 }
-
                 n = n.next(DOWN);
+            }
+            return check(n);
+        }
 
-                for (int i = 0; i < 4; i++) {
-                    int nx = n.x + dx[i];
-                    int ny = n.y + dy[i];
+        private boolean check(Point n) {
+            for (int i = 0; i < 4; i++) {
+                int nx = n.x + dx[i];
+                int ny = n.y + dy[i];
 
-                    if (inRange(nx, ny)) {
-                        if (board[nx][ny] != 0) {
-                            if (board[nx][ny] == idx) {
-                                continue;
-                            }
-                            return false;
+                if (inRange(nx, ny)) {
+                    if (board[nx][ny] != 0) {
+                        if (board[nx][ny] == idx) {
+                            continue;
                         }
-                    } else {
                         return false;
                     }
+                } else {
+                    return false;
                 }
             }
-
             return true;
         }
 
