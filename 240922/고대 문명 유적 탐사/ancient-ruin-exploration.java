@@ -28,6 +28,7 @@ public class Main {
         // K번 반복
         for (int i = 0; i < K; i++) {
             // 회전 격자를 찾음.
+            int maxScore = 0;
             int[] selectInfo = selectPieces();
             // 가장 점수가 큰 회전 정보를 바탕으로 실제 배열 회전
             if (selectInfo == null) {
@@ -35,74 +36,74 @@ public class Main {
             }
 
             rotate(selectInfo[0], selectInfo[1], selectInfo[2], originPieces);
+
             // 회전한 배열에서 유물 삭제
-            System.out.print(detectPiece() + " ");
+            while (true) {
+                fill();
+                int score = detectPiece(originPieces);
+                if (score == 0) {
+                    break;
+                }
+                maxScore += score;
+            }
+
+            System.out.print(maxScore + " ");
         }
     }
 
-    private static int detectPiece() {
-        int totalCnt = 0;
+    private static void fill() {
+        // 삭제된 곳에 유물 채워넣음
+        for (int i = 1; i <= 5; i++) {
+            for (int j = 5; j > 0; j--) {
+                if (originPieces[j][i] == 0) {
+                    originPieces[j][i] = newValues.poll();
+                }
+            }
+        }
+    }
 
-        while (true) {
-            boolean[][] visited = new boolean[6][6];
-            Stack<int[]> delete = new Stack<>();
-            for (int i = 1; i <= 5; i++) {
-                for (int j = 1; j <= 5; j++) {
-                    if (visited[i][j]) {
-                        continue;
-                    }
+    private static int detectPiece(int[][] arr) {
+        int score = 0;
+        boolean[][] visited = new boolean[6][6];
+        for (int i = 1; i <= 5; i++) {
+            for (int j = 1; j <= 5; j++) {
+                if (visited[i][j]) {
+                    continue;
+                }
 
-                    Queue<int[]> q = new ArrayDeque<>();
-                    q.add(new int[]{i, j});
-                    delete.add(new int[]{i, j});
-                    visited[i][j] = true;
-                    int cnt = 1;
-                    while (!q.isEmpty()) {
-                        int[] cur = q.poll();
+                Queue<int[]> q = new ArrayDeque<>();
+                Queue<int[]> d = new ArrayDeque<>();
+                q.add(new int[]{i, j});
+                d.add(new int[]{i, j});
+                visited[i][j] = true;
+                int cnt = 1;
+                while (!q.isEmpty()) {
+                    int[] cur = q.poll();
 
-                        for (int dir = 0; dir < 4; dir++) {
-                            int nx = cur[0] + dx2[dir];
-                            int ny = cur[1] + dy2[dir];
+                    for (int dir = 0; dir < 4; dir++) {
+                        int nx = cur[0] + dx2[dir];
+                        int ny = cur[1] + dy2[dir];
 
-                            if (nx >= 1 && nx <= 5 && ny >= 1 && ny <= 5 && !visited[nx][ny]
-                                    && originPieces[nx][ny] == originPieces[i][j]) {
-                                visited[nx][ny] = true;
-                                q.add(new int[]{nx, ny});
-                                delete.add(new int[]{nx, ny});
-                                cnt++;
-                            }
-                        }
-                    }
-
-                    if (cnt < 3) {
-                        for (int k = 0; k < cnt; k++) {
-                            delete.pop();
+                        if (nx >= 1 && nx <= 5 && ny >= 1 && ny <= 5 && !visited[nx][ny]
+                                && arr[nx][ny] == arr[i][j]) {
+                            visited[nx][ny] = true;
+                            q.add(new int[]{nx, ny});
+                            d.add(new int[]{nx, ny});
+                            cnt++;
                         }
                     }
                 }
-            }
 
-            // 유물 없으면 끝
-            if (delete.isEmpty()) {
-                return totalCnt;
-            }
-
-            // 유물 있으면 총 개수에 더해줌
-            totalCnt += delete.size();
-            while (!delete.isEmpty()) {
-                int[] cur = delete.pop();
-                originPieces[cur[0]][cur[1]] = 0;
-            }
-
-            // 삭제된 곳에 유물 채워넣음
-            for (int i = 1; i <= 5; i++) {
-                for (int j = 5; j > 0; j--) {
-                    if (originPieces[j][i] == 0) {
-                        originPieces[j][i] = newValues.poll();
+                if (cnt >= 3) {
+                    score += d.size();
+                    while (!d.isEmpty()) {
+                        int[] p = d.poll();
+                        arr[p[0]][p[1]] = 0;
                     }
                 }
             }
         }
+        return score;
     }
 
     private static int[][] copy(int[][] origin) {
@@ -119,15 +120,15 @@ public class Main {
         int[] info = new int[3];
         int maxCnt = 0;
         // 격자는 행이 작고, 열이 작아야 함.
-        for (int i = 4; i > 1; i--) {
-            for (int j = 4; j > 1; j--) {
-                for (int k = 3; k >= 1; k--) {
+        for (int k = 1; k <= 3; k++) {
+            for (int j = 2; j <= 4; j++) {
+                for (int i = 2; i <= 4; i++) {
                     // 회전 배열 가져옴
                     int[][] temp = copy(originPieces);
                     rotate(i, j, k, temp);
 
                     // 획득 가능한 유물 개수 파악
-                    int cnt = detectPieceCount(temp);
+                    int cnt = detectPiece(temp);
 
                     if (cnt > maxCnt) {
                         info[0] = i;
@@ -144,44 +145,6 @@ public class Main {
         }
 
         return info;
-    }
-
-    private static int detectPieceCount(int[][] temp) {
-        boolean[][] visited = new boolean[6][6];
-        Queue<int[]> q = new ArrayDeque<>();
-        int totalCnt = 0;
-        for (int i = 1; i <= 5; i++) {
-            for (int j = 1; j <= 5; j++) {
-                if (!visited[i][j]) {
-                    int cnt = 1;
-                    visited[i][j] = true;
-                    q.add(new int[]{i, j});
-                    while (!q.isEmpty()) {
-                        int[] cur = q.poll();
-
-                        for (int dir = 0; dir < 4; dir++) {
-                            int nx = cur[0] + dx2[dir];
-                            int ny = cur[1] + dy2[dir];
-
-                            // 범위 검사
-                            if (nx >= 1 && nx <= 5 && ny >= 1 && ny <= 5) {
-                                if (!visited[nx][ny] && temp[nx][ny] == temp[i][j]) {
-                                    visited[nx][ny] = true;
-                                    cnt++;
-                                    q.add(new int[]{nx, ny});
-                                }
-                            }
-                        }
-                    }
-
-                    if (cnt >= 3) {
-                        totalCnt += cnt;
-                    }
-                }
-            }
-        }
-
-        return totalCnt;
     }
 
 
