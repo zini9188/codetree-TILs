@@ -16,7 +16,7 @@ public class Main {
         C = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
 
-        board = new int[R + 2][C];
+        board = new int[R + 3][C];
 
         golems = new Golem[K + 1];
         int score = 0;
@@ -28,7 +28,7 @@ public class Main {
             golems[i] = new Golem(i, d, new Point(1, c));
             move(golems[i]);
             if (golems[i].c.x <= 2) {
-                board = new int[R + 2][C];
+                board = new int[R + 3][C];
                 continue;
             }
             golems[i].set();
@@ -54,7 +54,7 @@ public class Main {
     }
 
     private static boolean inRange(int x, int y) {
-        return x >= 0 && x < R + 2 && y >= 0 && y < C;
+        return x >= 0 && x < R + 3 && y >= 0 && y < C;
     }
 
     private static class Golem {
@@ -136,7 +136,7 @@ public class Main {
 
         // 현재 위치하는 출구가 다른 골렘과 인접하면 출구를 통해 다른 골렘으로 이동
         public int exit() {
-            boolean[][] visited = new boolean[R + 2][C];
+            boolean[][] visited = new boolean[R + 3][C];
 
             int maxRow = 0;
             Queue<Point> q = new ArrayDeque<>();
@@ -146,7 +146,7 @@ public class Main {
             while (!q.isEmpty()) {
                 Point cur = q.poll();
                 int curGolemIdx = board[cur.x][cur.y];
-                maxRow = Math.max(cur.x - 1, maxRow);
+                maxRow = Math.max(cur.x - 2, maxRow);
 
                 for (int dir = 0; dir < 4; dir++) {
                     int nx = cur.x + dx[dir];
