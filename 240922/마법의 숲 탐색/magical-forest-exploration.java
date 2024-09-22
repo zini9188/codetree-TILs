@@ -5,7 +5,8 @@ public class Main {
 
     private static final int UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
     private static int[] dx = {-1, 0, 1, 0}, dy = {0, 1, 0, -1};
-    private static int R, C, K;
+    private static int R;
+    private static int C;
     private static int[][] board;
     private static Golem[] golems;
 
@@ -14,20 +15,20 @@ public class Main {
         StringTokenizer st = new StringTokenizer(br.readLine());
         R = Integer.parseInt(st.nextToken());
         C = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(st.nextToken());
+        int k = Integer.parseInt(st.nextToken());
 
         board = new int[R + 3][C];
 
-        golems = new Golem[K + 1];
+        golems = new Golem[k + 1];
         int score = 0;
-        for (int i = 1; i <= K; i++) {
+        for (int i = 1; i <= k; i++) {
             st = new StringTokenizer(br.readLine());
             int c = Integer.parseInt(st.nextToken()) - 1;
             int d = Integer.parseInt(st.nextToken());
 
             golems[i] = new Golem(i, d, new Point(1, c));
             move(golems[i]);
-            if (golems[i].c.x <= 2) {
+            if (golems[i].c.x <= 3) {
                 board = new int[R + 3][C];
                 continue;
             }
