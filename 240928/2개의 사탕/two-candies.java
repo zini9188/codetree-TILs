@@ -22,7 +22,7 @@ public class Main {
     private static int bfs() {
         Queue<Element> q = new ArrayDeque<>();
         q.add(element);
-        boolean[][][][] visited = new boolean[N][M][N][M];
+        boolean[][][][][] visited = new boolean[4][N][M][N][M];
 
         for (int i = 1; i <= 10; i++) {
             int size = q.size();
@@ -63,6 +63,17 @@ public class Main {
                         continue;
                     }
 
+                    if (map[rNx][rNy] == 'O') {
+                        if (map[bNx][bNy] == 'O') {
+                            continue;
+                        }
+                        return i;
+                    }
+
+                    if (map[bNx][bNy] == 'O') {
+                        continue;
+                    }
+
                     if (bNx == rNx && bNy == rNy) {
                         if (map[bNx][bNy] == 'O' && map[rNx][rNy] == 'O') {
                             continue;
@@ -77,20 +88,12 @@ public class Main {
                         }
                     }
 
-                    if (visited[bNx][bNy][rNx][rNy]) {
+                    if (visited[k][bNx][bNy][rNx][rNy]) {
                         continue;
-                    }
-
-                    if (map[bNx][bNy] == 'O') {
-                        continue;
-                    }
-
-                    if (map[rNx][rNy] == 'O') {
-                        return i;
                     }
 
                     q.add(new Element(new Candy(bNx, bNy), new Candy(rNx, rNy)));
-                    visited[bNx][bNy][rNx][rNy] = true;
+                    visited[k][bNx][bNy][rNx][rNy] = true;
                 }
             }
         }
