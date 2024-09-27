@@ -90,6 +90,7 @@ public class Main {
                     }
 
                     q.add(new Element(new Candy(bNx, bNy), new Candy(rNx, rNy)));
+                    visited[k][bNx][bNy][rNx][rNy] = true;
                 }
             }
         }
