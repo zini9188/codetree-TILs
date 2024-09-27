@@ -24,7 +24,7 @@ public class Main {
         q.add(element);
         boolean[][][][][] visited = new boolean[4][N][M][N][M];
 
-        for (int i = 1; i < 10; i++) {
+        for (int i = 1; i <= 10; i++) {
             int size = q.size();
             for (int j = 0; j < size; j++) {
                 Element e = q.poll();
@@ -98,7 +98,7 @@ public class Main {
     }
 
     private static boolean outRange(int x, int y) {
-        return x < 0 || y < 0 || x >= N || y >= M || map[x][y] == '#';
+        return map[x][y] == '#';
     }
 
     private static void input() throws IOException {
