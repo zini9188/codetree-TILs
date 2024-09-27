@@ -22,7 +22,7 @@ public class Main {
     private static int bfs() {
         Queue<Element> q = new ArrayDeque<>();
         q.add(element);
-        boolean[][][][][] visited = new boolean[4][N][M][N][M];
+        boolean[][][][] visited = new boolean[N][M][N][M];
 
         for (int i = 1; i <= 10; i++) {
             int size = q.size();
@@ -77,7 +77,7 @@ public class Main {
                         }
                     }
 
-                    if (visited[k][bNx][bNy][rNx][rNy]) {
+                    if (visited[bNx][bNy][rNx][rNy]) {
                         continue;
                     }
 
@@ -90,7 +90,7 @@ public class Main {
                     }
 
                     q.add(new Element(new Candy(bNx, bNy), new Candy(rNx, rNy)));
-                    visited[k][bNx][bNy][rNx][rNy] = true;
+                    visited[bNx][bNy][rNx][rNy] = true;
                 }
             }
         }
